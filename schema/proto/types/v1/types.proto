@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package proto.types.v1;
+
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "autodesk.com/ftl/generated/proto/types/v1";
+
+message Owner {
+  string id = 1;
+  string name = 2;
+  string namespace = 3;
+  repeated string kinds = 4;
+  google.protobuf.Timestamp created = 5;
+  google.protobuf.Timestamp updated = 6;
+}
+
+message Member {
+  string id = 1;
+  string source = 2;
+}
+
+message MContextBase {
+  string id = 1;
+  string ext_id = 2;
+  string namespace = 3;
+}
+
+message MContext {
+  string id = 1;
+  string ext_id = 2;
+  string namespace = 3;
+  string kind = 4;
+  google.protobuf.Timestamp created = 5;
+}
+
+message MGroup {
+  string id = 1;
+  string m_context_id = 2;
+  repeated string members = 3;
+  google.protobuf.Timestamp created = 4;
+  google.protobuf.Timestamp updated = 5;
+}
+
+message Relation {
+  string id = 1;
+  string upstream_mgroup_id = 2;
+  string downstream_mgroup_id = 3;
+  string type = 4;
+  google.protobuf.Timestamp created = 5;
+  string owner = 6;
+}
+
+message Task {
+  string task_type = 1;
+  string task_id = 2;
+}
+
+message ApiStandardErrors {
+  string title = 1;
+  string detail = 2;
+  optional google.protobuf.Duration retry_after = 3;
+  optional string item_id = 4;
+}
+
+message SecurityMethodOption {
+  string provider = 1;
+  repeated string scope = 2;
+  string claim = 3;
+  string access_policy = 4;
+  bool is_activity_logged = 5;
+}
+
+message SecurityMethodOptions {
+  repeated SecurityMethodOption options = 1;
+}
+
+extend google.protobuf.MethodOptions {
+  optional SecurityMethodOptions security = 50000; // 50000-99999 is reserved for extensions, each extension must be unique
+}
+
+message GroupMembership {
+  string m_group_id = 1;
+  string user_id = 2;
+}

@@ -1,0 +1,4 @@
+package: oas
+generate:
+  models: true
+output: generated/oas/models.gen.go

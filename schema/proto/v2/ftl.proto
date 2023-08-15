@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+package proto.v2;
+
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/empty.proto";
+import "proto/types/v1/types.proto";
+
+option go_package = "autodesk.com/ftl/generated/proto/v2";
+
+service MContextService {
+  rpc Create(MContextServiceCreateRequest) returns (MContextServiceCreateResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["user"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+}
+
+message MContextServiceCreateRequest {
+  string ext_id = 1;
+  string namespace = 2;
+  string kind = 3;
+}
+
+message MContextServiceCreateResponse {
+  proto.types.v1.MContext m_context = 1;
+}
+
+service MGroupService {
+  rpc Create(MGroupServiceCreateRequest) returns (MGroupServiceCreateResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["user"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc RemoveMember(MGroupServiceRemoveMemberRequest) returns (MGroupServiceRemoveMemberResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["user"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc AddMember(MGroupServiceAddMemberRequest) returns (MGroupServiceAddMemberResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["user"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc AddMembers(MGroupServiceAddMembersRequest) returns (MGroupServiceAddMembersResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["user"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc Remove(MGroupServiceRemoveRequest) returns (google.protobuf.Empty) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["user"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+}
+
+message MGroupServiceCreateResponse {
+  string id = 1;
+  string m_context_id = 2;
+  repeated string members = 3;
+}
+
+message MGroupServiceCreateRequest {
+  string namespace = 1;
+  string ext_id = 2;
+  string external_group_id = 3 [deprecated = true]; // will not be supported on v3
+}
+
+message MGroupServiceCreateWithIDResponse {
+  string id = 1;
+  string m_context_id = 2;
+  repeated string members = 3;
+}
+
+message MGroupServiceRemoveMemberRequest {
+  string m_group_id = 1;
+  string user_id = 2;
+}
+
+message MGroupServiceRemoveMemberResponse {
+  proto.types.v1.Task task = 1;
+}
+
+message MGroupServiceAddMemberRequest {
+  string m_group_id = 1;
+  string user_id = 2;
+}
+
+message MGroupServiceAddMemberResponse {
+  proto.types.v1.Task task = 1;
+}
+
+message MGroupServiceAddMembersRequest {
+  repeated proto.types.v1.GroupMembership members = 1;
+}
+
+message MGroupServiceAddMembersResponse {
+  repeated proto.types.v1.Task task = 1;
+  repeated proto.types.v1.ApiStandardErrors errors = 2;
+}
+
+message MGroupServiceRemoveRequest {
+  string m_group_id = 1;
+}
+

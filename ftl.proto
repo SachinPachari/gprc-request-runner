@@ -1,0 +1,210 @@
+syntax = "proto3";
+
+package schema.ftl.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "git.autodesk.com/ftl/generated/remote";
+
+// core types
+message Owner {
+  string id = 1;
+  string name = 2;
+  string namespace = 3;
+  repeated string kinds = 4;
+  google.protobuf.Timestamp created = 5;
+  google.protobuf.Timestamp updated = 6;
+}
+
+message Member {
+  string id = 1;
+  string source = 2;
+}
+
+message MContext {
+  string id = 1;
+  string ext_id = 2;
+  string namespace = 3;
+  string kind = 4;
+  google.protobuf.Timestamp created = 5;
+}
+
+message MGroup {
+  string id = 1;
+  string m_context_id = 2;
+  repeated string members = 3;
+  google.protobuf.Timestamp created = 4;
+  google.protobuf.Timestamp updated = 5;
+}
+
+message ApiStandardErrors {
+    string title = 1;
+    string detail = 2;
+}
+// end of core types
+
+// services
+
+service HealthService {
+  rpc Get(google.protobuf.Empty) returns (HealthServiceGetResponse);
+}
+
+service OwnerService {
+  rpc Create(OwnerServiceCreateRequest) returns (OwnerServiceCreateResponse);
+  rpc AddKind(OwnerServiceAddKindRequest) returns (OwnerServiceAddKindResponse);
+  rpc List(google.protobuf.Empty) returns (OwnerServiceListResponse);
+  rpc Get(OwnerServiceGetRequest) returns (OwnerServiceGetResponse);
+}
+
+service MGroupService {
+  rpc Create(MGroupServiceCreateRequest) returns (MGroupServiceCreateResponse);
+  rpc AddMember(MGroupServiceAddMemberRequest) returns (google.protobuf.Empty);
+  rpc RemoveMember(MGroupServiceRemoveMemberRequest) returns (google.protobuf.Empty);
+  rpc GetByMemberId(MGroupServiceGetByMemberIdRequest) returns (MGroupServiceGetByMemberIdResponse);
+  rpc Get(MGroupServiceGetRequest) returns (MGroupServiceGetResponse);
+  rpc ListByMContext(MGroupServiceListByMContextRequest) returns (MGroupServiceListByMContextResponse);
+}
+
+service MContextService {
+  rpc Create(MContextServiceCreateRequest) returns (MContextServiceCreateResponse);
+  rpc Get(MContextServiceGetRequest) returns (MContextServiceGetResponse);
+  rpc GetByMGroupId(MContextServiceGetByMGroupIdRequest) returns (MContextServiceGetByMGroupIdResponse);
+  rpc GetByMemberId(MContextServiceGetByMemberIdRequest) returns (MContextServiceGetByMemberIdResponse);
+}
+
+service UserService {
+  rpc GetByExternalId(UserServiceGetByExternalIdRequest) returns (UserServiceGetByExternalIdResponse);
+  rpc ListByMGroupId(UserServiceListByMGroupIdRequest) returns (UserServiceListByMGroupIdResponse);
+}
+// end of services
+
+message HealthServiceGetResponse {
+  string application = 1;
+  string version = 2;
+}
+
+message OwnerServiceCreateRequest {
+  string name = 1;
+  string namespace = 2;
+}
+
+message OwnerServiceAddKindRequest {
+  string namespace = 1;
+  string kind = 2;
+}
+
+message OwnerServiceCreateResponse {
+  Owner owner = 1;
+}
+
+message OwnerServiceAddKindResponse {
+  Owner owner = 1;
+}
+
+message OwnerServiceGetResponse {
+  Owner owner = 1;
+}
+
+message OwnerServiceListResponse {
+  repeated Owner owners = 1;
+}
+
+message OwnerServiceGetRequest {
+  string namespace = 1;
+}
+
+message MGroupServiceGetByMemberIdRequest {
+  string member_id = 1;
+}
+
+message MGroupServiceGetRequest {
+  string m_group_id = 1;
+}
+
+message MGroupServiceGetResponse {
+  MGroup m_group = 1;
+}
+
+message MGroupServiceGetByMemberIdResponse {
+  repeated MGroup m_groups = 1;
+}
+
+message MGroupServiceCreateRequest {
+  string namespace = 1;
+  string ext_id = 2;
+}
+
+message MGroupServiceCreateResponse {
+  MGroup m_group = 1;
+}
+
+message MGroupServiceAddMemberRequest {
+  string m_group_id = 1;
+  string user_id = 2;
+}
+
+message MGroupServiceRemoveMemberRequest {
+  string m_group_id = 1;
+  string user_id = 2;
+}
+
+message MContextServiceCreateRequest {
+  string ext_id = 1;
+  string namespace = 2;
+  string kind = 3;
+}
+
+message MContextServiceGetRequest {
+  string namespace = 1;
+  string ext_id = 2;
+}
+
+message MContextServiceGetByMGroupIdRequest {
+  string m_group_id = 1;
+}
+
+message MContextServiceGetByMemberIdRequest {
+  string member_id = 1;
+}
+
+message MGroupServiceListByMContextRequest {
+  string namespace = 1;
+  string ext_id = 2;
+}
+
+message MContextServiceCreateResponse {
+  MContext m_context = 1;
+}
+
+message MContextServiceGetResponse {
+  MContext m_context = 1;
+}
+
+message MContextServiceGetByMGroupIdResponse {
+  MContext m_context = 1;
+}
+
+message MGroupServiceListByMContextResponse {
+  repeated MGroup m_groups = 1;
+}
+
+message MContextServiceGetByMemberIdResponse {
+  repeated MContext m_contexts = 1;
+}
+
+message UserServiceGetByExternalIdRequest {
+  string ext_id = 1;
+}
+
+message UserServiceGetByExternalIdResponse {
+  Member member = 1;
+}
+
+message UserServiceListByMGroupIdRequest {
+  string m_group_id = 1;
+}
+
+message UserServiceListByMGroupIdResponse {
+  repeated Member members = 1;
+}

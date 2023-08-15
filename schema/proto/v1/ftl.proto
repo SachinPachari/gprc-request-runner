@@ -1,0 +1,561 @@
+syntax = "proto3";
+
+package proto.v1;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "proto/types/v1/types.proto";
+
+option go_package = "autodesk.com/ftl/generated/proto/v1";
+
+service HealthService {
+  rpc Get(HealthServiceGetRequest) returns (HealthServiceGetResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["server-status"],
+          claim: "read"
+        }
+      ]
+    };
+  }
+}
+
+service OwnerService {
+  rpc Create(OwnerServiceCreateRequest) returns (OwnerServiceCreateResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc AddKind(OwnerServiceAddKindRequest) returns (OwnerServiceAddKindResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc List(google.protobuf.Empty) returns (OwnerServiceListResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc Get(OwnerServiceGetRequest) returns (OwnerServiceGetResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+}
+
+service MGroupService {
+  rpc Create(MGroupServiceCreateRequest) returns (MGroupServiceCreateResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["user"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc AddMember(MGroupServiceAddMemberRequest) returns (MGroupServiceAddMemberResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc RemoveMember(MGroupServiceRemoveMemberRequest) returns (MGroupServiceRemoveMemberResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc GetByMemberId(MGroupServiceGetByMemberIdRequest) returns (MGroupServiceGetByMemberIdResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc Get(MGroupServiceGetRequest) returns (MGroupServiceGetResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc ListByMContext(MGroupServiceListByMContextRequest) returns (MGroupServiceListByMContextResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc RemoveMGroup(MGroupServiceRemoveMGroupRequest) returns (google.protobuf.Empty) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+}
+
+service MContextService {
+  rpc Create(MContextServiceCreateRequest) returns (MContextServiceCreateResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc Get(MContextServiceGetRequest) returns (MContextServiceGetResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc GetByMGroupId(MContextServiceGetByMGroupIdRequest) returns (MContextServiceGetByMGroupIdResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc GetByMemberId(MContextServiceGetByMemberIdRequest) returns (MContextServiceGetByMemberIdResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+}
+
+service UserService {
+  rpc GetByExternalId(UserServiceGetByExternalIdRequest) returns (UserServiceGetByExternalIdResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc ListByMGroupId(UserServiceListByMGroupIdRequest) returns (UserServiceListByMGroupIdResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+}
+
+service RelationService {
+  rpc CreateRelations(RelationServiceCreateRelationsRequest) returns (RelationServiceCreateRelationsResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "write",
+          access_policy: "relation-write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc RemoveRelationsByAttributes(RelationServiceRemoveRelationsByAttributesRequest) returns (RelationServiceRemoveRelationsByAttributesResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "write",
+          access_policy: "relation-write",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc ListRelationsForGroup(RelationServiceListRelationsForGroupRequest) returns (stream ListRelationsForGroupResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          access_policy: "relation-read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+}
+
+service TaskService {
+  rpc Status(TaskServiceStatusRequest) returns (TaskServiceStatusResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+  rpc WatchStatus(TaskServiceWatchStatusRequest) returns (stream TaskServiceWatchStatusResponse) {
+    option (proto.types.v1.security) = {
+      options: [
+        {
+          provider: "forge",
+          scope: ["admin"],
+          claim: "read",
+          is_activity_logged: true
+        }
+      ]
+    };
+  }
+}
+
+// end of services
+message Status {
+  optional string client_name = 1;
+  string revision = 2;
+  string build_url = 3;
+  google.protobuf.Timestamp build_time = 4;
+  optional string hostname = 5;
+  repeated Dependency dependencies = 6;
+  string author = 7;
+  string message = 8;
+}
+
+message Dependency {
+  string description = 1;
+  repeated HistoryElement history = 2;
+}
+
+message HistoryElement {
+  bool healthy = 1;
+  google.protobuf.Timestamp time = 2;
+  google.protobuf.Duration duration = 3;
+  optional string error = 4;
+  optional google.protobuf.Any status = 5;
+}
+
+message HealthServiceGetRequest {
+  bool with_status = 1;
+}
+
+message HealthServiceGetResponse {
+  string application = 1;
+  string version = 2;
+  optional Status status = 3;
+}
+
+message OwnerServiceCreateRequest {
+  string name = 1;
+  string namespace = 2;
+}
+
+message OwnerServiceAddKindRequest {
+  string namespace = 1;
+  string kind = 2;
+}
+
+message OwnerServiceCreateResponse {
+  proto.types.v1.Owner owner = 1;
+}
+
+message OwnerServiceAddKindResponse {
+  proto.types.v1.Owner owner = 1;
+}
+
+message OwnerServiceGetResponse {
+  proto.types.v1.Owner owner = 1;
+}
+
+message OwnerServiceListResponse {
+  repeated proto.types.v1.Owner owners = 1;
+}
+
+message OwnerServiceGetRequest {
+  string namespace = 1;
+}
+
+message MGroupServiceGetByMemberIdRequest {
+  string member_id = 1;
+}
+
+message MGroupServiceGetRequest {
+  string m_group_id = 1;
+}
+
+message MGroupServiceGetResponse {
+  proto.types.v1.MGroup m_group = 1;
+}
+
+message MGroupServiceGetByMemberIdResponse {
+  repeated proto.types.v1.MGroup m_groups = 1;
+}
+
+message MGroupServiceCreateRequest {
+  string namespace = 1;
+  string ext_id = 2;
+}
+
+message MGroupServiceCreateResponse {
+  proto.types.v1.MGroup m_group = 1;
+}
+
+message MGroupServiceAddMemberRequest {
+  string m_group_id = 1;
+  string user_id = 2;
+}
+
+message MGroupServiceAddMemberResponse {
+  proto.types.v1.Task task = 1;
+}
+
+message MGroupServiceRemoveMemberRequest {
+  string m_group_id = 1;
+  string user_id = 2;
+}
+
+message MGroupServiceRemoveMemberResponse {
+  proto.types.v1.Task task = 1;
+}
+
+message MContextServiceCreateRequest {
+  string ext_id = 1;
+  string namespace = 2;
+  string kind = 3;
+}
+
+message MContextServiceGetRequest {
+  string namespace = 1;
+  string ext_id = 2;
+}
+
+message MContextServiceGetByMGroupIdRequest {
+  string m_group_id = 1;
+}
+
+message MContextServiceGetByMemberIdRequest {
+  string member_id = 1;
+}
+
+message MGroupServiceListByMContextRequest {
+  string namespace = 1;
+  string ext_id = 2;
+}
+
+message MContextServiceCreateResponse {
+  proto.types.v1.MContext m_context = 1;
+}
+
+message MContextServiceGetResponse {
+  proto.types.v1.MContext m_context = 1;
+}
+
+message MContextServiceGetByMGroupIdResponse {
+  proto.types.v1.MContext m_context = 1;
+}
+
+message MGroupServiceListByMContextResponse {
+  repeated proto.types.v1.MGroup m_groups = 1;
+}
+
+message MContextServiceGetByMemberIdResponse {
+  repeated proto.types.v1.MContextBase m_contexts = 1;
+}
+
+message UserServiceGetByExternalIdRequest {
+  string ext_id = 1;
+}
+
+message UserServiceGetByExternalIdResponse {
+  proto.types.v1.Member member = 1;
+}
+
+message UserServiceListByMGroupIdRequest {
+  string m_group_id = 1;
+}
+
+message UserServiceListByMGroupIdResponse {
+  repeated proto.types.v1.Member members = 1;
+}
+enum RelationDirection {
+  RELATION_DIRECTION_UNSPECIFIED = 0;
+  RELATION_DIRECTION_UPSTREAM = 1;
+  RELATION_DIRECTION_DOWNSTREAM = 2;
+}
+
+enum RelationType {
+  RELATION_TYPE_UNSPECIFIED = 0;
+  RELATION_TYPE_COPYTO = 1;
+  RELATION_TYPE_REMOVEFROM = 2;
+}
+
+message RelationServiceCreateRelationsItem {
+  string upstream_mgroup_id = 1;
+  string downstream_mgroup_id = 2;
+  RelationType type = 3;
+  string owner = 4;
+}
+
+message RelationServiceRemoveRelationsItem {
+  string upstream_mgroup_id = 1;
+  string downstream_mgroup_id = 2;
+  RelationType type = 3;
+  string owner = 4;
+}
+
+message RelationServiceCreateRelationsResponse {
+  repeated proto.types.v1.Relation created = 1;
+  repeated proto.types.v1.ApiStandardErrors errors = 2;
+}
+
+message RelationServiceCreateRelationsRequest {
+  repeated RelationServiceCreateRelationsItem relations = 1;
+}
+
+message RelationServiceRemoveRelationsByAttributesRequest {
+  repeated RelationServiceRemoveRelationsItem relations = 1;
+}
+
+message RelationServiceGetByRelationIdResponse {
+  proto.types.v1.Relation relation = 1;
+}
+
+message RelationServiceRemoveRelationsByAttributesResponse {
+  repeated RelationServiceRemoveRelationsItem removed = 1;
+  repeated proto.types.v1.ApiStandardErrors errors = 2;
+}
+
+message RelationServiceListRelationsForGroupRequest {
+  string mgroup_id = 1;
+  RelationDirection relation_direction = 2;
+  optional RelationType relations_type = 3;
+}
+
+message ListRelationsForGroupResponse {
+  proto.types.v1.Relation relation = 1;
+}
+
+message TaskServiceStatusRequest {
+  proto.types.v1.Task task = 1;
+}
+
+message TaskServiceStatusResponse {
+  string state = 1;
+}
+
+message TaskServiceWatchStatusRequest {
+  proto.types.v1.Task task = 1;
+}
+
+message TaskServiceWatchStatusResponse {
+  string state = 1;
+}
+
+message MGroupServiceRemoveMGroupRequest {
+  string m_group_id = 1;
+}
+
+message QueueMessageWire {
+  string type = 1;
+  string payload = 2;
+}

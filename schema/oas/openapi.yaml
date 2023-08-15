@@ -1,0 +1,1331 @@
+openapi: 3.0.3
+tags:
+  - name: health
+  - name: mcontexts
+  - name: members
+  - name: mgroups
+  - name: owners
+  - name: relations
+  - name: tasks
+info:
+  title: ftl
+  version: 0.1.0
+  description: |
+    # Memberships
+    **This spec is under active development.** Anticipate the potential for breaking changes 
+    *without* version change. Semantic versioning will begin with version 1.0.0.
+
+  contact: {}
+servers:
+  - url: "http://127.0.0.1:8080"
+    description: local dev
+  - url: "https://rest.us-west-2.dev.memberships.autodesk.com"
+    description: external for dev us-west-2
+  - url: "https://rest.us-east-1.stg.memberships.autodesk.com"
+    description: external for stg us-east-1
+  - url: "https://rest.us-west-2.stg.memberships.autodesk.com"
+    description: external for stg us-west-2
+  - url: "https://rest.us-east-1.memberships.autodesk.com"
+    description: external for prd us-east-1
+  - url: "https://rest.us-west-2.memberships.autodesk.com"
+    description: external for prd us-west-2
+paths:
+  /v0/owners:
+    post:
+      summary: Create an Owner.
+      description: |
+        Establishes a new consumer and consumer namespace (Owner) in the Memberships system as part 
+        of the new consumer onboarding process. **The use of this API is restricted to the 
+        Memberships team.**
+      operationId: addOwnerV0
+      security:
+        - forge:
+            - admin
+      tags:
+        - "owners"
+      parameters: []
+      requestBody:
+        description: |
+          The `name` and `namespace` of new Owner. The `namespace` becomes the Owner ID and must be 
+          globally unique.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Teams System"
+                  minLength: 1
+                namespace:
+                  type: string
+                  example: "ts"
+                  minLength: 1
+              required:
+                - name
+                - namespace
+      responses:
+        "201":
+          $ref: "#/components/responses/OwnerResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/NamespaceError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+    get:
+      summary: List all Owners.
+      description: |
+        Lists the full set of consumers (Owners) onboarded in the Membership system. **The use of 
+        this API is restricted to the Memberships team.**
+      operationId: getOwnerV0
+      security:
+        - forge:
+            - admin
+      tags:
+        - "owners"
+      parameters: []
+      responses:
+        "200":
+          $ref: "#/components/responses/OwnersResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+  /v1/health:
+    summary: Health endpoint
+    description: |
+      Enables the health of a service instance to be periodically tested.
+    get:
+      tags:
+        - "health"
+      parameters:
+        - in: query
+          name: withStatus
+          schema:
+            type: boolean
+          description: Return server status (requires server-status scope)
+      description: Health check.
+      operationId: getHealthV1
+      security:
+        - forge:
+            - server-status
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationOk"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+  /v0/owners/{namespace}/kinds/{kind}:
+    post:
+      summary: Add kind to an existing Owner.
+      description: |
+        The owning system can create one or more KINDS for use by that Owner. A kind is a subkey of the Owner..**
+      operationId: addKindToOwnerV0
+      security:
+        - forge:
+            - admin
+      tags:
+        - "owners"
+      parameters:
+        - name: namespace
+          in: path
+          description: namespace of the owner
+          required: true
+          schema:
+            type: string
+        - name: kind
+          in: path
+          description: kind to be added of owner
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          $ref: "#/components/responses/OwnerResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/NamespaceError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+  /v0/owners/{namespace}:
+    get:
+      summary: Get owner by namespace
+      description: |
+        Get owners onboarded in memberships  by namespace
+      operationId: getOwnerByNamespaceV0
+      security:
+        - forge:
+            - admin
+      tags:
+        - "owners"
+      parameters:
+        - in: path
+          required: true
+          name: namespace
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/OwnerResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/mcontexts:
+    post:
+      summary: |
+        Create mcontext is a sub resource of owner and is related to a specific kind.
+      description: Create new mcontext resource
+      operationId: createMContextV0
+      security:
+        - forge:
+            - user
+      tags:
+        - "mcontexts"
+      parameters: []
+      requestBody:
+        description: Accepts namespace, externalId,kind
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MContextBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/MContextResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/mgroups/{id}:
+    get:
+      tags:
+        - "mgroups"
+      description: Get MGroup by Id.
+      operationId: getMGroupByIdV0
+      security:
+        - forge:
+            - user
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/MGroupResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/mgroups/{id}/mcontext:
+    get:
+      summary: Get MGroup's MContext by ID
+      description: Get MGroup's MContext by ID
+      operationId: mGroupGetMContextV0
+      security:
+        - forge:
+            - user
+      tags:
+        - "mcontexts"
+      parameters:
+        - name: id
+          in: path
+          description: MGroup ID
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          example: mgroupid
+      responses:
+        "200":
+          $ref: "#/components/responses/MContextResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/owners/{namespace}/mcontext/{extId}:
+    get:
+      summary: |
+        Get MContext by namespace and external ID
+      description: |
+        Retrieve MContext information by providing a namespace and external ID
+      operationId: getMContextByNamespaceExternalIdV0
+      security:
+        - forge:
+            - user
+      tags:
+        - "owners"
+      parameters:
+        - name: namespace
+          in: path
+          description: owner's namespace
+          required: true
+          schema:
+            type: string
+        - name: extId
+          in: path
+          description: external id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/MContextResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/owners/{namespace}/mcontexts/{extId}/mgroups:
+    post:
+      description: "Add MGroup to existing mContext by passing namespace and external id"
+      summary: "Add MGroup to existing mContext"
+      operationId: addMGroupToMContextV0
+      security:
+        - forge:
+            - user
+      tags:
+        - "mgroups"
+      parameters:
+        - in: path
+          name: namespace
+          description: Owner's namespace
+          required: true
+          schema:
+            type: string
+            example: "namespace"
+        - in: path
+          name: extId
+          description: externalId of mContext
+          required: true
+          schema:
+            type: string
+            example: "2437331"
+      responses:
+        "201":
+          $ref: "#/components/responses/MGroupResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    get:
+      summary: |
+        List of mgroups by context id and namespace
+      description: |
+        Retrieve a List of mgroups by context id and namespace
+      operationId: getMContextMgroupsByNamespaceExtIdV0
+      security:
+        - forge:
+            - user
+      tags:
+        - "mgroups"
+      parameters:
+        - name: namespace
+          in: path
+          description: owner's namespace
+          required: true
+          schema:
+            type: string
+        - name: extId
+          in: path
+          description: external id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/ContextMGroupsResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+  /v0/mgroups/{id}/members:
+    patch:
+      summary: Add members to an mgroup
+      description: |
+        Add members (users) to the mgroup
+      operationId: addMemberV0
+      security:
+        - forge:
+            - user
+      tags:
+        - "members"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "somegroup_id"
+      requestBody:
+        description: |
+          The request body takes a user Id and source.  The source attribute is not required and will default to oxygen.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddMemberBody"
+      responses:
+        "202":
+          $ref: "#/components/responses/AddMemberAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+    get:
+      description: get users within the mGroup
+      operationId: getMGroupMembersV0
+      security:
+        - forge:
+            - user
+      summary: Get mgroup users
+      tags:
+        - "members"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            minLength: 1
+            type: string
+            example: mgroupid
+      responses:
+        "200":
+          $ref: "#/components/responses/MembersResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/mgroups/{id}/members/{mid}:
+    delete:
+      summary: Remove member from group
+      description: Remove user from mGroup
+      operationId: mGroupRemoveMemberV0
+      security:
+        - forge:
+            - user
+      tags:
+        - "members"
+      parameters:
+        - name: id
+          in: path
+          description: MGroup ID
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          example: mgroupid
+        - name: mid
+          in: path
+          description: Member ID (Oxygen ID initially)
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          example: memberid
+      responses:
+        "202":
+          $ref: "#/components/responses/RemoveMemberAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /v0/members/{id}/mgroups:
+    get:
+      tags:
+        - "mgroups"
+      summary: List MGroups for members
+      description: List MGroups for member by passing an memberId
+      operationId: getMGroupsForMemberV0
+      security:
+        - forge:
+            - user
+      parameters:
+        - name: id
+          in: path
+          description: id of member
+          required: true
+          schema:
+            type: string
+            example: "some_member_id"
+      responses:
+        "200":
+          $ref: "#/components/responses/MGroupsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/members/{id}/mcontexts:
+    get:
+      tags:
+        - "mcontexts"
+      summary: List MContext for member
+      description: List MContexts for member by passing memberId
+      operationId: getMContextsForMemberV0
+      security:
+        - forge:
+            - user
+      parameters:
+        - name: id
+          in: path
+          description: id of member
+          required: true
+          schema:
+            type: string
+            example: "some_member_id"
+      responses:
+        "200":
+          $ref: "#/components/responses/MemberMContextsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/members/{id}:
+    get:
+      summary: Get members by id
+      description: |
+        Retrieve a list of members by passing an memberId
+      tags:
+        - "members"
+      operationId: getMemberV0
+      security:
+        - forge:
+            - user
+      parameters:
+        - name: id
+          in: path
+          description: id of member
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            example: memberid
+      responses:
+        "200":
+          $ref: "#/components/responses/MemberResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/tasks/{taskType}/status:
+    post:
+      summary: Get task status by task type
+      description: |
+        Retrieve the status of a task
+      tags:
+        - "tasks"
+      operationId: getTaskStatusV0
+      security:
+        - forge:
+            - user
+      requestBody:
+        description: Get task status request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskStatusRequest"
+      parameters:
+        - name: taskType
+          in: path
+          description: is one of "addMember" or "removeMember"
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            example: addMember
+      responses:
+        "200":
+          $ref: "#/components/responses/TaskStatusResponse"
+  /v0/relations:batch-delete:
+    post:
+      description: "delete relations"
+      summary: "Delete the set of relations identified in the request payload"
+      operationId: deleteRelationsV0
+      security:
+        - forge:
+            - user
+        - accessPolicy:
+            - "relation-write"
+      tags:
+        - "relations"
+      requestBody:
+        description: Array of Relations that holds upstreamGroupId, downstreamGroupId, relationType and owner information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteRelationsBody"
+      responses:
+        "204":
+          $ref: "#/components/responses/DeleteRelationResponse"
+        "207":
+          $ref: "#/components/responses/MultiStatusRelationResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/relations:
+    post:
+      description: "Create relations"
+      summary: "Create relations between MGroups"
+      operationId: createRelationsV0
+      security:
+        - forge:
+            - user
+        - accessPolicy:
+            - "relation-write"
+      tags:
+        - "relations"
+      requestBody:
+        description: Array of Relations that holds upstreamGroupId, downstreamGroupId, relationType and owner information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddRelationsBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/AddRelationResponse"
+        "207":
+          $ref: "#/components/responses/MultiStatusRelationResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntities"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v0/mgroups/{id}/relations:
+    get:
+      tags:
+        - "relations"
+      summary: List Relations for mGroup
+      description: List Relations for mGroup by passing groupId
+      operationId: getRelationsForMGroupV0
+      security:
+        - forge:
+            - user
+        - accessPolicy:
+            - "relation-read"
+      parameters:
+        - name: id
+          in: path
+          description: id of mGroup
+          required: true
+          schema:
+            type: string
+            example: "some_member_id"
+        - name: filter[rtype]
+          in: query
+          description: optional field can be used to filter out results based on relation type.
+          schema:
+            type: string
+            enum: ["CopyTo", "RemoveFrom"]
+            example: "CopyTo"
+      responses:
+        "200":
+          $ref: "#/components/responses/RelationsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  securitySchemes:
+    forge:
+      type: openIdConnect
+      openIdConnectUrl: https://developer.api.autodesk.com/.well-known/openid-configuration
+  responses:
+    Conflict:
+      description: Resource make exists in FTL # What did we try to say here?
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    UnprocessableEntity:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    UnprocessableEntities:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardErrors"
+    NamespaceError:
+      description: Namespace must be unique.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    InternalServerError:
+      description: Internal Server Error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    GatewayTimeout:
+      description: Gateway Timeout Error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    BadGateway:
+      description: Bad Gateway Error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    NotFound:
+      description: Requested resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    NoContent:
+      description: No Content
+    ServiceUnavailable:
+      description: A service component was not available
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    OwnerResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Owner"
+    OwnersResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Owners"
+    MContextResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MContext"
+    MGroupResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MGroup"
+    MGroupsResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MGroups"
+    MembersResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Members"
+    ContextMGroupsResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MGroups"
+    MemberMContextsResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MContexts"
+    MemberResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Member"
+    TaskStatusResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TaskStatus"
+    TooManyRequests:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiStandardError"
+    AddMemberAccepted:
+      description: Add Member Accepted
+      headers:
+        Location:
+          schema:
+            type: string
+            example: /tasks/addMember/status
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TaskAccepted"
+    RemoveMemberAccepted:
+      description: Remove Member Accepted
+      headers:
+        Location:
+          schema:
+            type: string
+            example: /tasks/removeMember/status
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TaskAccepted"
+    AddRelationResponse:
+      description: Relation Created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Relations"      
+    DeleteRelationResponse:
+      description: Relation Deleted
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Relations"
+    RelationsResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Relations"
+    MultiStatusRelationResponse:
+      description: Multi Status
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MultiStatusRelation"
+  schemas:
+    MContextBase:
+      description: Limited base attributes of an MContext
+      type: object
+      properties:
+        id:
+          type: string
+          example: Teams:2437331
+        extId:
+          type: string
+          example: "2437331"
+        namespace:
+          description: well know as owner id
+          type: string
+          example: Teams
+      required:
+        - id
+    MContext:
+      description: Mcontext has a kind which is specific to its owning system.
+      allOf:
+        - $ref: "#/components/schemas/MContextBase"
+        - type: object
+          properties:
+            created:
+              type: string
+              format: date-time
+              example: 2023-01-17 15:39:23.000
+            kind:
+              type: string
+              example: kind
+    MContextBody:
+      description: Request body for new create a new resource context
+      properties:
+        extId:
+          type: string
+          example: "788543"
+        namespace:
+          type: string
+          example: Teams
+        kind:
+          type: string
+          example: team
+    Owner:
+      description: An Owner is a consumer of the Memberships system.
+      type: object
+      properties:
+        id:
+          type: string
+          example: "ts"
+        name:
+          type: string
+          example: "Team System"
+        namespace:
+          type: string
+          example: "ts"
+        kinds:
+          type: array
+          items:
+            type: string
+          example: ["team"]
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+    Owners:
+      description: A list of consumers of the Memberships system (Owners).
+      type: array
+      maxItems: 200
+      items:
+        $ref: "#/components/schemas/Owner"
+    AddMemberBody:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "LPWNM4L28R6R"
+        source:
+          type: string
+          example: "oxygen"
+      required:
+        - userId
+    TaskStatusRequest:
+      type: object
+      properties:
+        taskId:
+          type: string
+          example: "MozgWqlCQTPHZQu7CfNc1slDz0dnrOSI3H5OPIEThOntTD2sw4NkGlvpNiXtl4mexvfRKxAT5bNSBVHOReYFdAKpIKw3EVOwOa0w"
+      required:
+        - taskId
+    ApplicationOk:
+      description: Health check
+      type: object
+      properties:
+        application:
+          type: string
+          example: OK
+        version:
+          type: string
+          example: v1
+        status:
+          $ref: "#/components/schemas/ServerStatus"
+      required:
+        - application
+        - version
+    ServerStatus:
+      description: Server status
+      type: object
+      properties:
+        clientName:
+          type: string
+        revision:
+          type: string
+        buildURL:
+          type: string
+        buildTime:
+          type: string
+          format: date-time
+          example: "2023-01-17 15:39:23.000"
+        hostname:
+          type: string
+        dependencies:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/Dependency"
+      required:
+        - revision
+        - buildURL
+        - buildTime
+        - dependencies
+    Dependency:
+      type: object
+      properties:
+        description:
+          type: string
+        history:
+          type: array
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/HistoryElement"
+      required:
+        - description
+        - history
+    HistoryElement:
+      type: object
+      properties:
+        healthy:
+          type: boolean
+        status: {}
+        time:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          format: int64
+        error:
+          type: string
+      required:
+        - healthy
+        - time
+        - duration
+    ApiStandardErrors:
+      description: ApiStandardError
+      type: array
+      maxItems: 200
+      items:
+        $ref: "#/components/schemas/ApiStandardError"
+    ApiStandardError:
+      description: Error Responses for the Forge API Standards.
+      type: object
+      properties:
+        detail:
+          type: string
+        title:
+          type: string
+        resultCode:
+          type: integer
+        item:
+          type: string
+        retryAfter:
+          type: integer
+          description: "in milliseconds"
+          format: int64
+      required:
+        - detail
+        - title
+    MGroup:
+      description: Add MGroups in mContext
+      type: object
+      properties:
+        id:
+          type: string
+          example: "some_id"
+        mContextId:
+          type: string
+          example: "some_mcontext_id"
+        members:
+          type: array
+          items:
+            type: string
+          example: ["User1"]
+        created:
+          type: string
+          format: date-time
+          example: "2023-01-17 15:39:23.000"
+        updated:
+          type: string
+          format: date-time
+          example: "2023-01-17 15:39:23.000"
+      required:
+        - id
+        - mContextId
+        - members
+        - created
+        - updated
+    MGroups:
+      description: MGroups
+      type: array
+      maxItems: 200
+      items:
+        $ref: "#/components/schemas/MGroup"
+    Members:
+      description: Members
+      type: array
+      maxItems: 200
+      items:
+        $ref: "#/components/schemas/Member"
+    Member:
+      description: Member
+      type: object
+      required:
+        - id
+        - source
+      properties:
+        id:
+          type: string
+          example: userType:extId
+          description: userType is always oxygen for now
+        source:
+          type: string
+          example: example
+    MContexts:
+      description: list of MContexts
+      type: array
+      maxItems: 200
+      items:
+        $ref: "#/components/schemas/MContextBase"
+    TaskAccepted:
+      description: task type and id
+      type: object
+      required:
+        - taskType
+        - taskId
+        - status
+      properties:
+        taskType:
+          type: string
+          example: addMember
+          description: is one of "addMember" or "removeMember"
+        taskId:
+          type: string
+          example: "MozgWqlCQTPHZQu7CfNc1slDz0dnrOSI3H5OPIEThOntTD2sw4NkGlvpNiXtl4mexvfRKxAT5bNSBVHOReYFdAKpIKw3EVOwOa0w"
+        status:
+          type: string
+          example: pending
+          description: is always "pending"
+    TaskStatus:
+      description: task status
+      type: object
+      required:
+        - state
+      properties:
+        state:
+          type: string
+          example: unknown
+    AddRelationsBody:
+      description: list of Relations
+      type: array
+      maxItems: 200
+      minItems: 1
+      items:
+        $ref: "#/components/schemas/RelationBody"
+    RelationBody:
+      description: Request body for adding relation between two groups
+      required:
+        - relationType
+        - upstreamGroup
+        - downstreamGroup
+        - owner
+      properties:
+        relationType:
+          type: string
+          nullable: false
+          enum: ["CopyTo", "RemoveFrom"]
+        upstreamGroup:
+          type: string
+          nullable: false
+          example: "uGroupId"
+        downstreamGroup:
+          type: string
+          nullable: false
+          example: "dGroupId"
+        owner:
+          type: string
+          nullable: false
+          example: "teams"
+    DeleteRelationsBody:
+      description: list of Relations
+      type: array
+      maxItems: 200
+      items:
+        $ref: "#/components/schemas/RelationBody"
+    Relations:
+      description: Relations between mgroups
+      type: array
+      maxItems: 200
+      items:
+        $ref: "#/components/schemas/Relation"
+    Relation:
+      description: Relation Object
+      type: object
+      required:
+        - upstream
+        - downstream
+        - relationType
+        - owner
+      properties:
+        upstream:
+          type: string
+          example: umGroupId
+          description: Upstream GroupId
+        downstream:
+          type: string
+          example: dmGroupId
+          description: Downstream GroupId
+        relationType:
+          type: string
+          enum: ["CopyTo", "RemoveFrom"]
+          example: CopyTo
+          description: Type of Relation between upstream and downstream group
+        owner:
+          type: string
+          example: teams
+          description: Namespace of the owner
+    MultiStatusRelation:
+      description: Partial Success
+      type: object
+      required:
+        - results
+        - errors
+      properties:
+        results:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/Relation"
+        errors:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/ApiStandardError"

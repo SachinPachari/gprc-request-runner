@@ -1,0 +1,72 @@
+{
+  "OwnerService": {
+    "Create": {
+      "input": {
+        "name": "name",
+        "namespace": "nss"
+      },
+      "output": {}
+    },
+    "AddKind": {
+      "input": {
+        "namespace": "nss",
+        "kind": "hub"
+      },
+      "output": {}
+    },
+    "List": {
+      "input": {},
+      "output": {}
+    },
+    "Get": {
+      "input": { "namespace": "nss" },
+      "output": {}
+    }
+  },
+  "MContextService": {
+    "Create": {
+      "input": {
+        "ext_id": "ext",
+        "namespace": "$.OwnerService.Create.output.owner.namespace",
+        "kind": "hub"
+      },
+      "output": {}
+    },
+    "Get": {
+      "input": {
+        "namespace": "$.OwnerService.Create.output.owner.namespace",
+        "ext_id": "ext"
+      },
+      "output": {}
+    }
+  },
+  "MGroupService": {
+    "Create": {
+      "input": {
+        "namespace": "$.OwnerService.Create.output.owner.namespace",
+        "ext_id": "ext"
+      },
+      "output": {}
+    },
+    "Get": {
+      "input": {
+        "m_group_id": "$.MGroupService.Create.output.m_group.id"
+      },
+      "output": {}
+    },
+    "AddMember": {
+      "input": {
+        "m_group_id": "$.MGroupService.Create.output.m_group.id",
+        "user_id": "some_user_id"
+      },
+      "output": {}
+    },
+    "RemoveMember": {
+      "input": {
+        "m_group_id": "$.MGroupService.Create.output.m_group.id",
+        "user_id": "some_user_id"
+      },
+      "output": {}
+    }
+  }
+}

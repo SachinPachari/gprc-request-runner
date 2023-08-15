@@ -1,0 +1,5 @@
+package: oas
+output: generated/oas/ftl.gen.go
+additional-imports: []
+generate:
+  echo-server: true
